@@ -1,0 +1,24 @@
+{
+  "name": "espn-fantasy-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for ESPN Fantasy Football (read-only): league settings, teams, rosters, matchups, box scores, free agents, transactions, player lookup",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": { "espn-fantasy-mcp-server": "dist/index.js" },
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "build": "tsc && chmod +x dist/index.js",
+    "clean": "rm -rf dist"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

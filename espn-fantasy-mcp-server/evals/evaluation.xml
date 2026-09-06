@@ -1,0 +1,43 @@
+<evaluation>
+  <!-- All questions use ESPN public league 48347143, season 2025 (completed; answers are stable). No auth needed. -->
+  <qa_pair>
+    <question>In ESPN league 48347143 for the 2025 season, how many points per reception does the league award?</question>
+    <answer>0.5</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), which team finished the regular season as the #1 playoff seed, and what was its win total?</question>
+    <answer>Help me stepbro Im stuck, 12 wins</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), who won the championship matchup in week 17 of the winners bracket, and by how many points?</question>
+    <answer>Team Richie RICH, by 51.7 points (123.7 to 72)</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), which player was drafted with the 1.05 pick (5th overall), and which team drafted him?</question>
+    <answer>Jahmyr Gibbs, Smokin' that Herbert</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), the team that drafted Malik Nabers in round 1 took which wide receiver in round 2?</question>
+    <answer>Puka Nacua</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), the #1 seed lost exactly two regular-season games (weeks 1-14). Which two teams beat them?</question>
+    <answer>Smokin' that Herbert (week 3) and Team Richie RICH (week 14)</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In the week 17 championship of ESPN league 48347143 (2025), which starting quarterback for the winning team scored the most points in the game, and how many?</question>
+    <answer>Drake Maye, 32.4</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), Smokin' that Herbert started Jahmyr Gibbs in week 17. How many points did Gibbs score versus his projection that week?</question>
+    <answer>5.4 actual vs 19.4 projected</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), what was the week 10 matchup score between Team Snacks and Smokin' that Herbert, and who won?</question>
+    <answer>Smokin' that Herbert won 155 to 69.9</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In ESPN league 48347143 (2025), how much of its $100 FAAB budget had the 10th-place team (Uncle Buck) spent by season end, and how many teams spent the full $100?</question>
+    <answer>Uncle Buck spent $0; 2 teams spent the full $100 (Smokin' that Herbert and Team Richie RICH)</answer>
+  </qa_pair>
+</evaluation>

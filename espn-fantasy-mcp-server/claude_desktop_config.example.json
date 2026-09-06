@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "espn-fantasy": {
+      "command": "node",
+      "args": ["/Users/YOUR_USERNAME/espn-fantasy-mcp-server/dist/index.js"],
+      "env": {
+        "ESPN_LEAGUE_ID": "1340458779",
+        "ESPN_SEASON": "2026",
+        "ESPN_S2": "PASTE_ESPN_S2_VALUE_HERE",
+        "ESPN_SWID": "{PASTE-SWID-HERE-WITH-BRACES}"
+      }
+    }
+  }
+}
