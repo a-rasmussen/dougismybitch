@@ -7,6 +7,9 @@
  * Public endpoints (player pool, pro schedules) work without them.
  */
 
+import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { API_BASE_URL, REQUEST_TIMEOUT_MS, defaultSeason } from "../constants.js";
 import type { EspnErrorEnvelope, EspnLeague } from "../types.js";
 
@@ -26,11 +29,24 @@ export interface AuthConfig {
   swid?: string;
 }
 
+/** Credentials file written by scripts/save-espn-cookies.sh (kept outside Claude Desktop's config). */
+export const CREDENTIALS_FILE =
+  process.env.ESPN_CREDENTIALS_FILE?.trim() || join(homedir(), ".config", "espn-fantasy", "credentials.json");
+
+/** Env vars win; otherwise fall back to the credentials file. Read on every call so refreshed cookies apply without a restart. */
 export function loadAuthFromEnv(): AuthConfig {
-  return {
-    espnS2: process.env.ESPN_S2?.trim() || undefined,
-    swid: process.env.ESPN_SWID?.trim() || undefined,
-  };
+  let espnS2 = process.env.ESPN_S2?.trim() || undefined;
+  let swid = process.env.ESPN_SWID?.trim() || undefined;
+  if (!espnS2 || !swid) {
+    try {
+      const f = JSON.parse(readFileSync(CREDENTIALS_FILE, "utf8")) as { espn_s2?: string; swid?: string };
+      espnS2 ||= f.espn_s2?.trim() || undefined;
+      swid ||= f.swid?.trim() || undefined;
+    } catch {
+      /* no credentials file - public data only */
+    }
+  }
+  return { espnS2, swid };
 }
 
 export function defaultLeagueId(): number | undefined {
