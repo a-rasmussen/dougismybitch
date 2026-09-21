@@ -13,7 +13,7 @@ LEAGUE=1340458779
 [ -x "$NODE" ] || { echo "Node not found at $NODE"; exit 1; }
 
 # 1. Claude Desktop must be closed, or it will overwrite our change.
-while pgrep -qf "/Applications/Claude.app/Contents/MacOS/Claude"; do
+while ps -axo comm | grep -qx "/Applications/Claude.app/Contents/MacOS/Claude"; do
   echo "Claude Desktop is still open. Quit it now (click it, then Cmd+Q). Waiting..."
   sleep 5
 done
