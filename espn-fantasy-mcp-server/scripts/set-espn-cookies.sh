@@ -29,6 +29,12 @@ printf 'Paste SWID value INCLUDING {braces} (hidden), then Enter: '
 IFS= read -rs RAW_SWID; echo
 printf '\e[?2004h'
 
+if ps -axo comm | grep -qx "/Applications/Claude.app/Contents/MacOS/Claude"; then
+  echo
+  echo "STOP: Claude Desktop was reopened before saving. It would erase the change."
+  echo "Quit Claude Desktop (Cmd+Q) and run this script again. Reopen it only after you see SUCCESS."
+  exit 1
+fi
 export RAW_S2 RAW_SWID CFG SERVER_DIR NODE LEAGUE
 python3 - <<'PY' || exit 1
 import json, os, re, shutil, time
@@ -67,4 +73,4 @@ try {
   console.log(`SUCCESS - connected to "${j.settings?.name ?? "league"}" with ${j.teams?.length} teams:`);
   for (const t of j.teams ?? []) console.log(`  ${t.name ?? ((t.location??"")+" "+(t.nickname??"")).trim()}  (${t.record?.overall?.wins ?? 0}-${t.record?.overall?.losses ?? 0})`);
 } catch (err) { console.log("Network error:", err.message, err.cause?.message ?? ""); process.exit(1); }
-' && { echo; echo "All set. Reopen Claude Desktop now."; }
+' && { echo; echo "All set. NOW reopen Claude Desktop."; }
