@@ -1,8 +1,8 @@
 # espn-fantasy-mcp-server
 
-Read-only MCP server for ESPN Fantasy Football. Lets Claude Desktop read your league: settings, standings, rosters, matchups, box scores, schedules, draft results, free agents, player lookups, and transaction/activity history.
+MCP server for ESPN Fantasy Football. Lets Claude Desktop read your league: settings, standings, rosters, matchups, box scores, schedules, draft results, free agents, player lookups, and transaction/activity history. It can also change your own team's roster: lineup moves and free-agent add/drop.
 
-It talks to ESPN's undocumented v3 API (`lm-api-reads.fantasy.espn.com`). ESPN can change this API without notice; if a tool starts failing, that is the most likely reason.
+It talks to ESPN's undocumented v3 API (`lm-api-reads.fantasy.espn.com`, and `lm-api-writes.fantasy.espn.com` for roster changes). ESPN can change this API without notice; if a tool starts failing, that is the most likely reason.
 
 ## Tools
 
@@ -20,8 +20,17 @@ It talks to ESPN's undocumented v3 API (`lm-api-reads.fantasy.espn.com`). ESPN c
 | `espn_get_player` | Player detail with week-by-week actual vs projected |
 | `espn_get_recent_activity` | Full-season activity feed: adds, drops, waiver bids, trades |
 | `espn_list_transactions` | Current-week transaction queue incl. pending waiver claims and trade proposals |
+| `espn_set_lineup` | **Writes.** Moves your players between starting slots, bench and IR |
+| `espn_add_drop` | **Writes.** Adds a free agent and/or drops a player from your team |
 
-All tools accept `response_format: "markdown"` (default, compact) or `"json"` (full structured data).
+All read tools accept `response_format: "markdown"` (default, compact) or `"json"` (full structured data).
+
+### Write tools
+
+`espn_set_lineup` and `espn_add_drop` change the real roster on ESPN. Both take `confirm` (default `false`): without it they only validate and describe the change; with `confirm: true` they execute it. They only ever act on the team managed by the account whose cookies are saved.
+
+- `espn_set_lineup` sends all `moves` as one transaction, so a swap is two moves in one call. It checks slot eligibility, slot capacity and game locks before sending.
+- `espn_add_drop` only adds free agents. Players on waivers need a waiver claim, which is not implemented. A dropped player goes to waivers and may be claimed by someone else, so drops can't reliably be undone.
 
 ## Setup on a Mac (Claude Desktop)
 
@@ -85,7 +94,7 @@ These cookies usually last for months, but they do expire. If the server starts 
 Replace `YOUR_USERNAME` with your Mac username (run `whoami` in Terminal if unsure). If `node` isn't found by Claude Desktop, replace `"command": "node"` with the full path from running `which node` in Terminal (often `/usr/local/bin/node` or `/opt/homebrew/bin/node`).
 
 3. Save, then fully quit Claude Desktop (Cmd+Q) and reopen it.
-4. In a new chat, click the tools/connectors icon — you should see **espn-fantasy** with 12 tools. Try: *"Show me my league standings."*
+4. In a new chat, click the tools/connectors icon — you should see **espn-fantasy** with 14 tools. Try: *"Show me my league standings."*
 
 ### Environment variables
 
@@ -109,12 +118,13 @@ Or use the MCP Inspector: `npx @modelcontextprotocol/inspector node dist/index.j
 
 ## Security notes
 
-- Read-only: no tool can change lineups, make claims, or trade. ESPN's write API is not implemented.
+- Two tools write: `espn_set_lineup` and `espn_add_drop`, each only with `confirm: true` and only on your own team. Nothing can make waiver claims or trades.
 - Cookies live only in your local `claude_desktop_config.json`. Don't share that file or paste the cookies into chats.
-- The server makes requests only to `lm-api-reads.fantasy.espn.com`.
+- The server makes requests only to `lm-api-reads.fantasy.espn.com` and `lm-api-writes.fantasy.espn.com`.
 
 ## Known limitations
 
 - ESPN's player pool does not return a total count, so `has_more` is inferred from a full page.
 - `espn_list_transactions` (view `mTransactions2`) only holds current/recent transactions; `espn_get_recent_activity` is the season-long feed. The activity feed's message format follows the community-documented structure in [cwendt94/espn-api](https://github.com/cwendt94/espn-api); it could not be tested against a public league (ESPN restricts the feed to members), so verify on first use.
 - Weekly "actual" points appear only after games are played.
+- `espn_add_drop` has only been exercised in preview mode; its request format is taken from transactions the ESPN website created. `espn_set_lineup` has been run against a live league.

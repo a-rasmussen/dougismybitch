@@ -1,6 +1,8 @@
 /** Shared constants and ESPN ID maps. */
 
 export const API_BASE_URL = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl";
+/** Roster moves and add/drops are POSTed to a separate host. */
+export const API_WRITE_BASE_URL = "https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl";
 export const CHARACTER_LIMIT = 25000;
 export const REQUEST_TIMEOUT_MS = 30000;
 

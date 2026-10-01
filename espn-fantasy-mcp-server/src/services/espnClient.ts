@@ -10,7 +10,7 @@
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { API_BASE_URL, REQUEST_TIMEOUT_MS, defaultSeason } from "../constants.js";
+import { API_BASE_URL, API_WRITE_BASE_URL, REQUEST_TIMEOUT_MS, defaultSeason } from "../constants.js";
 import type { EspnErrorEnvelope, EspnLeague } from "../types.js";
 
 export class EspnApiError extends Error {
@@ -129,6 +129,53 @@ export async function espnGet<T>(path: string, opts: EspnRequestOptions = {}, au
     throw new EspnApiError(`ESPN API error (HTTP ${res.status}): ${msg}`, res.status, espnType);
   }
 
+  return body as T;
+}
+
+/**
+ * POST a transaction (lineup move, add/drop) to ESPN's write API. Requires cookies.
+ * ESPN rejects invalid moves with an error envelope; every message it returns is surfaced.
+ */
+export async function espnPost<T>(path: string, payload: unknown, auth: AuthConfig = loadAuthFromEnv()): Promise<T> {
+  const cookie = buildCookieHeader(auth);
+  if (!auth.espnS2 || !auth.swid || !cookie) {
+    throw new EspnApiError("Changing a roster requires ESPN_S2 and ESPN_SWID cookies (run scripts/save-espn-cookies.sh).");
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(`${API_WRITE_BASE_URL}${path}`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json", "User-Agent": "espn-fantasy-mcp-server/1.0", Cookie: cookie },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new EspnApiError("Request to ESPN timed out after 30s. The move may or may not have gone through - check the roster before retrying.");
+    }
+    throw new EspnApiError(`Network error reaching ESPN: ${err instanceof Error ? err.message : String(err)}`);
+  } finally {
+    clearTimeout(timer);
+  }
+
+  const text = await res.text();
+  let body: unknown;
+  try {
+    body = text ? JSON.parse(text) : {};
+  } catch {
+    throw new EspnApiError(`ESPN returned non-JSON (HTTP ${res.status}). The write endpoint may have changed or the cookies may be invalid.`, res.status);
+  }
+  if (!res.ok) {
+    const env = body as EspnErrorEnvelope;
+    const espnType = env?.details?.[0]?.type;
+    const msgs = [...new Set([...(env?.messages ?? []), ...(env?.details ?? []).map((d) => d.message)].filter(Boolean))];
+    if (res.status === 401 || res.status === 403) {
+      throw new EspnApiError(`ESPN refused the change (HTTP ${res.status}${msgs.length ? `: ${msgs.join("; ")}` : ""}). The cookies may have expired or may not belong to this team's manager.`, res.status, espnType);
+    }
+    throw new EspnApiError(`ESPN rejected the change (HTTP ${res.status}): ${msgs.join("; ") || "no reason given"}`, res.status, espnType);
+  }
   return body as T;
 }
 
