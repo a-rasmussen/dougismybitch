@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * espn-fantasy-mcp-server — read-only MCP server for ESPN Fantasy Football.
+ * espn-fantasy-mcp-server — MCP server for ESPN Fantasy Football. Read tools plus two roster-changing
+ * tools (espn_set_lineup, espn_add_drop) that preview by default and only write with confirm=true.
  *
  * Environment variables:
  *   ESPN_LEAGUE_ID  default league id (optional; tools accept league_id too)
@@ -17,6 +18,7 @@ import { registerLeagueTools } from "./tools/league.js";
 import { registerMatchupTools } from "./tools/matchups.js";
 import { registerPlayerTools } from "./tools/players.js";
 import { registerTransactionTools } from "./tools/transactions.js";
+import { registerRosterTools } from "./tools/roster.js";
 import { loadAuthFromEnv, defaultLeagueId } from "./services/espnClient.js";
 import { defaultSeason } from "./constants.js";
 
@@ -26,6 +28,7 @@ registerLeagueTools(server);
 registerMatchupTools(server);
 registerPlayerTools(server);
 registerTransactionTools(server);
+registerRosterTools(server);
 
 async function main(): Promise<void> {
   const auth = loadAuthFromEnv();
