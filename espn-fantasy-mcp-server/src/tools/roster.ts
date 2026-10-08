@@ -185,7 +185,8 @@ Always run a preview first and get the user's explicit go-ahead on the exact pla
 
         const head = teamDisplayName(ctx.team);
         if (!a.confirm) return toolResult(`${head}, proposed transaction:\n${lines.join("\n")}${PREVIEW_FOOTER}`, { executed: false, team_id: ctx.team.id, items });
-        const tx = await submit(ctx, "FREEAGENT", items);
+        // ESPN rejects a FREEAGENT transaction with no ADD item; a drop on its own is a ROSTER transaction.
+        const tx = await submit(ctx, a.add_player_id !== undefined ? "FREEAGENT" : "ROSTER", items);
         return toolResult(`${head}, transaction submitted (ESPN status: ${tx.status ?? "unknown"}):\n${lines.join("\n")}`, { executed: true, status: tx.status, transaction_id: tx.id, team_id: ctx.team.id, items });
       } catch (e) { return toolError(e); }
     },
